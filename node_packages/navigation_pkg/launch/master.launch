@@ -1,0 +1,64 @@
+<launch>
+        <!-- SETUP -->
+        <machine name="master_odroid" user="odroid" address="10.1.1.2"/>
+        <machine name="slave_laptop" user="priam93" address="10.1.1.6" env-loader="~/mrsd_project/dji_code/devel/env_laptop.sh"/>
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- LAPTOP NODES -->
+
+        <node machine="slave_laptop" pkg="palantir_pkg" type="docking_velocity.py" name="detection_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+        <node machine="slave_laptop" pkg="palantir_pkg" type="serial_read_IR.py" name="ir_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+        <node machine="slave_laptop" pkg="usb_cam" name="usb_cam" type="usb_cam_node">
+                <param name="pixel_format" value="yuyv" />
+                <param name="video_device" value="/dev/video1" />
+        </node>
+
+        <node machine="slave_laptop" pkg="april_tag" name="april_tag_node" type="april_tag_node">
+                <!--<remap from="/camera/image_raw" to="/usb_cam/image_raw"/>-->
+
+                <!-- focal_length_px: camera focal length in pixels. 
+                700 works well forlate 2013 macbook pro retina 13in -->
+                <!-- <param name="focal_length_px" value="508"/> -->
+                
+                <!-- tag_size_cm: size of edge of the black frame in cms -->
+                <!-- <param name="tag_size_cm" value="16.5"/> -->
+        </node>
+
+        <node machine="slave_laptop" pkg="palantir_pkg" type="palantir.py" name="palantir_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- ODROID NODES -->
+
+        <node machine="master_odroid" pkg="dji_sdk" type="dji_sdk_node" name="N1_parser_node" output="screen">
+                <!-- node parameters -->
+                <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+                <param name="baud_rate" type="int" value="230400"/>
+                <param name="app_id" type="int" value="1023378"/>
+                <param name="app_api_level" type="int" value="2"/>
+                <param name="app_version" type="int" value="1"/>
+                <param name="app_bundle_id" type="string" value="Welcome to use dji-sdk"/>
+                <param name="enc_key" type="string" value="3b203546b800ae5c4082322282305be0a051db0f4ac0cfdb99965ba871329b65"/>
+        </node>
+        
+        <node machine="master_odroid" pkg="guidance" type="guidanceNode" name="guidance_node"/>
+        
+        <node machine="master_odroid" pkg="navigation_pkg" type="dji_sdk_client" name="nav_node"/>
+
+        <node machine="master_odroid" pkg="state_pkg" type="state_node" name="state_node" output="screen"/>
+
+        <node machine="master_odroid" pkg="comm_odroid" type="receiver.py" name="decision_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+</launch>
+
+
+

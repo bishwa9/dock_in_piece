@@ -1,0 +1,24 @@
+<launch>
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- LAPTOP NODES -->
+
+        <node pkg="palantir_pkg" type="palantir.py" name="palantir_node" output="screen">
+        	<param name="/use_sim_time" value="true"/>
+        </node>
+        <node pkg="palantir_pkg" type="serial_read_IR.py" name="ir_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- ODROID NODES -->
+
+        <node pkg="comm_odroid" type="receiver.py" name="decision_node" output="screen">
+        	<param name="/use_sim_time" value="true"/>
+        </node>
+
+</launch>
+
+
+

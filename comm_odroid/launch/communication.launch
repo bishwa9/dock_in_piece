@@ -1,0 +1,10 @@
+<launch>
+
+<machine name="odroid" user="odroid" address="10.1.1.2" env-loader="/home/odroid/Desktop/dji_code/devel/env1.sh"/>
+<machine name="aishanou" user="aishanou" address="10.1.1.7"/>
+
+	<node machine="aishanou" name="transmitter" pkg="comm_odroid" type="transmitter.py" />
+	<node machine="odroid" name="receiver" pkg="comm_odroid" type="receiver.py" />
+	<node machine="odroid" name="navigation" pkg="comm_odroid" type="navigation.py" />
+	
+</launch>

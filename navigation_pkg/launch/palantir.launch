@@ -1,0 +1,27 @@
+<launch>
+        <!-- SETUP -->
+        <machine name="master_odroid" user="odroid" address="10.1.1.2"/>
+        <machine name="slave_laptop" user="priam93" address="10.1.1.6" env-loader="~/mrsd_project/dji_code/devel/env_laptop.sh"/>
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- LAPTOP NODES -->
+
+        <node machine="slave_laptop" pkg="palantir_pkg" type="palantir.py" name="palantir_node" output="screen">
+        	<param name="/use_sim_time" value="true"/>
+        </node>
+        <node machine="slave_laptop" pkg="palantir_pkg" type="serial_read_IR.py" name="ir_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
+
+<!-- ***************************************************************************************************************************************** -->
+        <!-- ODROID NODES -->
+
+        <node machine="master_odroid" pkg="comm_odroid" type="receiver.py" name="decision_node" output="screen">
+        	<param name="/use_sim_time" value="true"/>
+        </node>
+
+</launch>
+
+
+

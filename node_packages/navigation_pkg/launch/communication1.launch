@@ -1,0 +1,9 @@
+<launch>
+
+<machine name="magma" user="magma" address="192.168.1.123" env-loader="/home/catkin_ws/devel/env1.sh"/>
+<machine name="aishanou" user="aishanou" address="192.168.1.118" />
+
+	<node machine="aishanou" name="transmitter" pkg="communication" type="transmitter.py" />
+	<node machine="magma" name="receiver" pkg="communication" type="receiver.py" />
+	
+</launch>

@@ -1,0 +1,32 @@
+<launch>
+        <param name="/usb_cam/pixel_format" value="yuyv"/>
+
+        <node pkg="usb_cam" name="usb_cam" type="usb_cam_node">
+	        <param name="video_device" value="/dev/video0" />
+        </node>
+
+        <node pkg="april_tag" name="april_tag_node" type="april_tag_node">
+                <!--<remap from="/camera/image_raw" to="/usb_cam/image_raw"/>-->
+
+                <!-- focal_length_px: camera focal length in pixels.
+                700 works well forlate 2013 macbook pro retina 13in -->
+                <!-- <param name="focal_length_px" value="508"/> -->
+
+                <!-- tag_size_cm: size of edge of the black frame in cms -->
+                <!-- <param name="tag_size_cm" value="16.5"/> -->
+        </node>
+
+        <node pkg="dji_sdk" type="dji_sdk_node" name="N1_parser_node" output="screen">
+                <!-- node parameters -->
+                <param name="serial_name" type="string" value="/dev/ttyUSB0"/>
+                <param name="baud_rate" type="int" value="230400"/>
+                <param name="app_id" type="int" value="1023378"/>
+                <param name="app_api_level" type="int" value="2"/>
+                <param name="app_version" type="int" value="1"/>
+                <param name="app_bundle_id" type="string" value="Welcome to use dji-sdk"/>
+                <param name="enc_key" type="string" value="3b203546b800ae5c4082322282305be0a051db0f4ac0cfdb99965ba871329b65"/>
+        </node>
+	<node pkg="navigation_pkg" type="dji_sdk_client" name="nav_node" output="screen"/>
+	<!-- node pkg="rosbag" type="record" name="logger" args="-a -O /home/odroid/Desktop/dji_code/log/$(env TIME)" -->
+
+</launch>

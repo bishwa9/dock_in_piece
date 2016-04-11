@@ -1,0 +1,15 @@
+(catkin_make
+
+source devel/setup.bash
+
+roslaunch april_tag april_tag_usb.launch 
+
+rostopic echo /april_tags
+
+rosrun image_view image_view image:=/april_tag_debug/output_video
+
+
+
+rosrun rqt_tf_tree rqt_tf_tree (for checking transform tree)
+
+

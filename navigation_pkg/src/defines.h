@@ -37,6 +37,7 @@ typedef enum {
 	stabilize_collect,
 	palantir_decision_made,
 	approach_dock,
+    dock_rejected,
 	docked,
 	error_activation, 
 	error_permission, 
@@ -195,11 +196,14 @@ float calcDistance(float vPrev, float dPrev, float time_)
 
 void velPub_callback(const ros::TimerEvent& not_used)
 {
-	publish_command_velocity(vel_command.velX, vel_command.dt,
-							 vel_command.velY, vel_command.dt,
-							 vel_command.velZ, vel_command.dt);
-   	drone->attitude_control(HORIZ_VEL|VERT_VEL|YAW_ANG|HORIZ_GND|YAW_GND, 
-   								vel_command.velX, vel_command.velY, vel_command.velZ, 0);
+	if (state != dock_rejected)
+	{
+		publish_command_velocity(vel_command.velX, vel_command.dt,
+								 vel_command.velY, vel_command.dt,
+								 vel_command.velZ, vel_command.dt);
+	   	drone->attitude_control(HORIZ_VEL|VERT_VEL|YAW_ANG|HORIZ_GND|YAW_GND, 
+	   								vel_command.velX, vel_command.velY, vel_command.velZ, 0);
+   }
 }
 
 void state_callback(const std_msgs::UInt8::ConstPtr& state_)

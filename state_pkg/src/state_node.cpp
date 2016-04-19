@@ -58,6 +58,11 @@ int main(int argc, char **argv)
                 handle_approach_dock();
                 break;
             }
+            case dock_rejected:
+            {
+                handle_dock_rejected();
+                break;
+            }
             case docked:
             {
                 handle_docked();

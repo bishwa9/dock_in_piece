@@ -36,6 +36,7 @@ typedef enum {
 	stabilize_collect,
 	palantir_decision_made,
 	approach_dock,
+    dock_rejected,
 	docked,
 	error_activation, 
 	error_permission, 
@@ -64,7 +65,7 @@ std::clock_t start_time, end_time;
 double elapsed_time;
 
 volatile sig_atomic_t flag = 0;
-volatile bool flag_decision, flag_palantir;
+volatile bool flag_decision, flag_palantir, flag_rejected;
 
 /*************USER DEFINED FUNCTIONS TO PUBLISH INFORMATION*************/
 
@@ -90,13 +91,21 @@ void ctrl_c_callback(int sig)
 }
 
 void decision_callback(const std_msgs::Float64::ConstPtr& data)
-{
-	flag_decision = true;
+{	
+    if(!flag_rejected)
+    {
+        flag_decision = true;
+    }
 }
 
 void palantir_callback(const palantir_pkg::palantir_msg::ConstPtr& data)
 {
 	flag_palantir = true;
+    if(data->timeToMove < 0)
+    {
+        flag_rejected = true;
+        flag_decision = false;
+    }
 }
 
 void initialize_state_node(int argc, char **argv, ros::NodeHandle nh)
@@ -121,6 +130,7 @@ void initialize_state_node(int argc, char **argv, ros::NodeHandle nh)
     state = init;
     flag_decision = false;
     flag_palantir = false;
+    flag_rejected = false;
 
     ROS_INFO("State Set-Up complete, Please press Ctrl+C to properly terminate process!");	
 }

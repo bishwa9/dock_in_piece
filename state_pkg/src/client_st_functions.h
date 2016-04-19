@@ -183,11 +183,16 @@ void handle_stabilize_collect()
     }
     //send position command
     //drone->local_position_navigation_send_request(x_toGo, y_toGo, (drone->local_position).z);
-    if(flag_palantir)
+    if(flag_palantir && !flag_rejected)
     {
         state = palantir_decision_made;
         ROS_INFO("Palantir has made a decision");
     }    
+    else if(flag_rejected)
+    {
+        state = dock_rejected;
+        ROS_INFO("State: Dock Rejected");
+    }
     //publish_state();
 }
 
@@ -216,6 +221,25 @@ void handle_palantir_decision_made()
         ROS_INFO("Time to move");
     }    
     //publish_state();
+}
+
+void handle_dock_rejected()
+{
+    if(!drone->activation)
+    {//lost activation
+        handle_err_activation();
+        return;
+    }
+    if(!drone->sdk_permission_opened)
+    {//lost permission
+        handle_err_permission();
+        return;
+    }
+    if(flag_rejected)
+    {
+        drone->landing();
+        ROS_INFO("State: LANDING");
+    }
 }
 
 void handle_approach_dock()

@@ -5,14 +5,14 @@ import sys
 import time
 import rospy
 import std_msgs.msg
-from dji_sdk.msg import Velocity
+import dji_sdk.msg
 from palantir_pkg.msg import docked
 
 lis=[]
-m_range=20
+m_range=10
 dock_stat=0
 done = 0
-quad_vel=0.15
+quad_vel=0
 
 def vel_val_cb(msg):
     global quad_vel
@@ -76,7 +76,7 @@ def docking_velocity():
     rospy.init_node('docking_velocity', anonymous=True)
     rospy.Subscriber("/serial/dockDetection", std_msgs.msg.Float64, detection_cb)
     rospy.Subscriber("/serial/irReadings", std_msgs.msg.Float64, velocity_cb)
-    rospy.Subscriber("/dji_sdk/velocity", Velocity, vel_val_cb)
+    rospy.Subscriber("/dji_sdk/velocity", dji_sdk.msg.Velocity, vel_val_cb)
 
     rospy.spin()
 

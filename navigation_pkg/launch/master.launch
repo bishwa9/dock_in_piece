@@ -14,9 +14,13 @@
                 <param name="/use_sim_time" value="true"/>
         </node>
 
+        <node machine="slave_laptop" pkg="palantir_pkg" type="serial_read_dock.py" name="dock_detection_node" output="screen">
+                <param name="/use_sim_time" value="true"/>
+        </node>
+
         <node machine="slave_laptop" pkg="usb_cam" name="usb_cam" type="usb_cam_node">
                 <param name="pixel_format" value="yuyv" />
-                <param name="video_device" value="/dev/video1" />
+                <param name="video_device" value="/dev/video0" />
         </node>
 
         <node machine="slave_laptop" pkg="april_tag" name="april_tag_node" type="april_tag_node">

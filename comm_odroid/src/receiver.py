@@ -13,7 +13,7 @@ debug_pub_start = rospy.Publisher('/debug/waiting_start', UInt8, queue_size=10)
 debug_pub_stop = rospy.Publisher('/debug/waiting_stop', UInt8, queue_size=10)
 debug1 = 10
 debug2 = 10
-cur_st = 6
+cur_st = 0
 palantir_decision_made_st = 6
 
 def timer_cb(event):
@@ -33,14 +33,22 @@ def callback(data):
 
 	#print "Decision_node state", cur_st
 	if cur_st == palantir_decision_made_st:
+
+		if data.timeToMove < 0:
+			print "WILL NOT DOCK!\nFREQUENCY TOO HIGH!\nLanding!"
+			velocity=data.velocity
+			decision_pub.publish(velocity)
+			return
+
 		time_start=rospy.Time.now()
 		print "time start receiver", time_start		
-		timeToMove=data.timeToMove
+		timeToMove=data.timeToMove-1.5
 		print "Move in", timeToMove
 		velocity=data.velocity
 		debug1 = 100
-		while rospy.Time.now() < time_start + rospy.Duration.from_sec(data.timeToMove):
-			# print "waiting"
+		time_ = time.time()
+		while rospy.Time.now() < time_start + rospy.Duration.from_sec(timeToMove):
+			print "Decision_node waiting", time.time() - time_
 			time.sleep(0.2)
 		print "time done receiver", rospy.Time.now()
 		print "time waited for receiver", rospy.Time.now() - time_start

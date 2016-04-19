@@ -123,7 +123,13 @@ class Data_class:
         ind_1 = int(1/(self.dom_f*resolution))
         ind_2 = int(2/(self.dom_f*resolution))
         print "time_ind1",predict_time_vector[ind_1]
+        print "val_ind1", y_hat[0, ind_1]
         print "time_ind2",predict_time_vector[ind_2]
+        print "val_ind2", y_hat[0, ind_2]
+        print "time_rand1", predict_time_vector[int( (ind_1+ind_2)/2.0 )]
+        print "val_rand1", y_hat[0, int( (ind_1+ind_2)/2.0 )]
+        print "time_rand2", predict_time_vector[int(ind_1+100)]
+        print "val_rand2", y_hat[0, int( ind_1+100 )]
         
         # print "Time predicting for:", predict_time_vector[-1]
         # print "ind_1", ind_1
@@ -133,7 +139,7 @@ class Data_class:
         #y_hat_3 = y_hat[0,ind_2::]
         index_min = y_hat_2.argmax() + ind_1
         print "Index min:", index_min
-        print "time_index_min: ", predict_time_vector(index_min)
+        print "time_index_min: ", predict_time_vector[index_min]
 
         #y_hat = y_hat[0,index_min+1::]
 
@@ -156,26 +162,30 @@ class pubsub:
         self.ir_sub = rospy.Subscriber(ir_sub_name, std_msgs.msg.Float64, self.ir_cb)
         self.debug_start_pub = rospy.Publisher("/debug/collection_start", std_msgs.msg.UInt8, queue_size=10, latch=True)
         self.debug_stop_pub = rospy.Publisher("/debug/collection_stop", std_msgs.msg.UInt8, queue_size=10, latch=True)
+        self.debug_rise_pub = rospy.Publisher("/debug/palantir_rise", std_msgs.msg.UInt8, queue_size=10, latch=True)
+        self.debug_rise_pub = rospy.Publisher("/debug/palantir_rise", std_msgs.msg.UInt8, queue_size=10, latch=True)
         rospy.Timer(rospy.Duration(0.2), self.timer_cb)
         self.st = 0
         self.data_read = ir_num*[0]
         self.num_ir_read = 0
         self.num_to_read = ir_num
-        self.reading_start_time  = time.time()
+        self.start_time  = time.time()
         self.time_took_to_read = time.time()
         self.printed = False
         self.started = 10
         self.stopped = 10
+        self.rise = 10
         # print "Palantir: Publishers and Subscribers setuped"
 
     def timer_cb(self, event):
         self.debug_start_pub.publish(self.started)
         self.debug_stop_pub.publish(self.stopped)
+        self.debug_rise_pub.publish(self.rise)
         return
 
     def state_cb(self,state):
         self.st = state.data
-        print self.st
+        # print self.st
         return
 
     def publish_prediciton(self,vel, time_to_move):
@@ -194,9 +204,9 @@ class pubsub:
 
         if self.num_ir_read == self.num_to_read and not self.printed:
             self.stopped = 100   
-            self.time_took_to_read = time.time() - self.reading_start_time 
+            self.time_took_to_read = time.time() - self.start_time 
             print "IR Reading Done Time:", time.time()
-            print "Data collected for:" self.time_took_to_read
+            print "Data collected for:", self.time_took_to_read
             self.printed = True
             # file_ = open("~/collected.txt", "w")
             # for i in self.data_read:
@@ -241,10 +251,18 @@ if __name__ == '__main__':
         print "time to lowest", time_to_lowest
         print "Time vector", data_obj.time_vector[0], data_obj.time_vector[-1]
         # print "done"
+        if data_obj.dom_f > 0.16:
+            time_to_move = -10
+            vel = -0.3
         while pubsub_obj.st < 6:
             pubsub_obj.publish_prediciton(vel, time_to_move)
             time.sleep(1)
         pubsub_obj.publish_prediciton(vel, time_to_move)
+        time_wait = time.time()
+        while time.time() < time_wait + time_to_move:
+            print "Palantir wait:",time.time() - time_wait
+            time.sleep(0.2)        
+        pubsub_obj.rise = 100
     	#data_obj.showPlot()
         rospy.spin()
 

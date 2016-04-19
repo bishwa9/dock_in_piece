@@ -213,7 +213,7 @@ void handle_palantir_decision_made()
     if(flag_decision)
     {
         state = approach_dock;
-        ROS_INFO("Time to move up");
+        ROS_INFO("Time to move");
     }    
     //publish_state();
 }
